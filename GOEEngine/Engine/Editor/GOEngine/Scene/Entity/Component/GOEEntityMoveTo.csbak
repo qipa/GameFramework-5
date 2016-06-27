@@ -1,0 +1,490 @@
+﻿using System;
+using UnityEngine;
+using System.Collections.Generic;
+namespace GOEngine.Implement
+{
+#if UNITY_EDITOR
+    public
+#else
+    internal
+#endif
+ class GOEEntityMoveTo : GOEEntityComponent
+    {
+        protected bool isMoving = false;
+        protected float mTime = 0.0f;
+        bool mMoveByTime = false;
+
+        internal GOEActorEntity Actor
+        {
+            get { return Entity as GOEActorEntity; }
+        }
+
+        public GOEEntityMoveTo()
+        {
+            mEnable = false;
+        }
+
+
+        ~GOEEntityMoveTo()
+        {
+        }
+
+        internal bool IsMoving
+        {
+            get { return isMoving; }
+        }
+
+        private bool _paused = false;
+        public void PauseMove()
+        {
+            _paused = true;
+        }
+
+        public void RestartMove()
+        {
+            _paused = false;
+        }
+
+        private bool EqualsPos(Vector3 start, Vector3 end)
+        {
+            return Vector3.Distance(start, end) < 0.01;
+        }
+
+        private float _lastDegree = -1000;
+        private const float LIMITMOVE = 10;
+        private bool _atEdge = false;
+        internal void MoveDir(float degree, float shift = 0)
+        {
+            
+            if (Math.Abs(_lastDegree - degree) < LIMITMOVE && shift == 0)
+                return;
+            Matrix4x4 mat = new Matrix4x4();
+            mat.SetTRS(Vector3.zero, Quaternion.Euler(0, degree + shift, 0), Vector3.one);
+            Vector3 dir = mat.MultiplyVector(GOERoot.GOECamera.Camera.transform.forward);
+            dir.Normalize();
+
+            Vector3 dir2 = mat.MultiplyVector(Vector3.forward);
+            dir2.Normalize();
+            Debug.Log(dir2.ToString());
+
+            bool canmove = true;
+            Vector3 cast;
+            if (!Actor.ClientDetour)
+            {
+                cast = Entity.Position + dir * 1;
+            }
+            else
+            {
+                Vector3 tempstart = Entity.Position;
+
+                if( Math.Abs(dir2.x) > Math.Abs(dir2.z))
+                {
+                    tempstart = -(dir2.x * GOERoot.GOECamera.Camera.transform.right).normalized * 0.1f + Entity.Position;
+                }
+                tempstart = (dir2.x * GOERoot.GOECamera.Camera.transform.right).normalized * 0.3f + (dir2.z * GOERoot.GOECamera.Camera.transform.up).normalized * 0.3f + Entity.Position;
+                tempstart = tempstart - dir * 0.6f;
+                Vector3 end = tempstart + dir * 1000;
+                Vector3 ssafda = tempstart;
+                Debug.DrawLine(tempstart, end);
+                Entity.Scene.getIntersectTerrainPos( Actor, ref tempstart);
+
+                if (!EqualsPos(tempstart, ssafda))
+                {
+                    //Debug.Log("tempstart = " + tempstart.ToString() + "-----" + "ssafda = " + ssafda.ToString());
+                }
+
+                Debug.DrawLine(tempstart, end, Color.blue);
+                Entity.Scene.getIntersectTerrainPos(Actor, ref end);
+                if (Entity.Scene.IsPositionWalkable(Actor, tempstart))
+                {
+                    canmove = Entity.Scene.GetRaycast(Actor, tempstart, end, out cast) == DetourMgr.DT_SUCCESS;
+                }
+                else
+                {
+                    canmove = Entity.Scene.GetRaycast(Actor, Entity.Position, end, out cast) == DetourMgr.DT_SUCCESS;
+                }
+
+                Debug.DrawLine(tempstart, end, Color.blue);
+            }
+            if (canmove)
+            {
+                Entity.Scene.getIntersectTerrainPos(Actor, ref cast);
+                if (EqualsPos(cast, Entity.Position))
+                {
+					//Debug.Log("cast = " + cast.ToString());
+                    _lastDegree = degree;
+                    MoveDir(degree, 0);
+                    return;
+                }
+                //if (shift > 0 && Vector3.Distance(cast, Entity.Position) > 0.2)
+                //{
+                //    cast = Entity.Position + dir * 0.2f;
+                //}
+                endMoveByNextMove();
+                _atEdge = shift != 0;
+
+                //Debug.Log("move cast = " + cast.ToString());
+                moveStraight(cast);
+                _lastDegree = degree;
+            }
+            else if (!isMoving)
+            {
+                _lastDegree = -1000;
+            }
+        }
+
+        private List<Vector3> _path = new List<Vector3>();
+        private Action _onNearTarget;
+        internal List<Vector3> MoveTo(float x, float y, Action onNear)
+        {
+            Vector3 end = new Vector3();
+            Vector3 scp = new Vector3(x, y, 0);
+            if (!Entity.Scene.GetIntersectTerrainPos(scp, ref end))
+            {
+                Ray ray = GOERoot.GOECamera.Camera.ScreenPointToRay(scp);
+                float dis = (Actor.Position.y - ray.origin.y) / ray.direction.y;
+                end = ray.origin + ray.direction * dis;
+                Actor.Scene.getNearestPoint(end, out end, Actor);
+            }
+
+            return MoveTo(end, onNear);
+        }
+
+        internal void MoveTo(List<Vector3> path, Action onReach)
+        {
+            endMoveByNextMove();
+            _path.Clear();
+            _path.AddRange(path);
+            _onNearTarget += onReach;
+            beginMove();
+        }
+
+        internal List<Vector3> MoveTo(Vector3 end, Action onNear, float dis = 0f)
+        {
+			//Debug.Log ("want move to " + end.ToString ());
+            bool canMove = false;
+            endMoveByNextMove();
+            if (Actor.ClientDetour)
+            {
+                if (!Entity.Scene.CheckPositonByRayCast(ref end))
+                {
+                    Actor.Scene.getNearestPoint(end, out end, Actor);
+                }
+                if (Entity.Scene.GetPath(Actor, Actor.Position, end, out _path) == DetourMgr.DT_SUCCESS)
+                {
+                    canMove = true;
+                    resetEnd(dis);
+                    if (_path.Count > 0)
+                        beginMove();
+                }
+            }
+            else
+            {
+                canMove = true;
+                moveStraight(end);
+            }
+            if (isMoving)
+                _onNearTarget += onNear;
+            else if (canMove && onNear != null)
+                onNear();
+            return _path;
+        }
+
+        private void resetEnd(float dis)
+        {
+            if (dis <= 0)
+                return;
+            int count = _path.Count - 1;
+            Vector3 end = _path[count];
+            Vector3 start = Actor.Position;
+            if (_path.Count > 1)
+                start = _path[count - 1];
+
+            if (start.Equals(end))
+                return;
+            if (Vector3.Distance(start, end) > dis)
+            {
+                Vector3 dir = (end - start);
+                dir.Normalize();
+                end = end - dir * dis;
+                _path[count] = end;
+            }
+            else
+            {
+                _path.RemoveAt(count);
+            }
+        }
+
+        internal List<Vector3> MoveClose(Vector3 pos, Action onClose, float dis = 1.0f)
+        {
+            return MoveTo(pos, onClose, dis);
+        }
+
+        internal void StopMove()
+        {
+            endMove(false);
+        }
+
+        private void endMoveByNextMove()
+        {
+            _onNearTarget = null;
+            bool old = isMoving;
+            clearData();
+            isMoving = old;
+        }
+
+        private float speed
+        {
+            get
+            {
+                if (_tempSpeed > 0)
+                    return _tempSpeed;
+                return Actor.MoveSpeed;
+            }
+        }
+
+        private float _tempSpeed = -1;
+        private bool _keepFace;
+        private bool _keepAni;
+        internal void MoveStraight(Vector3 end, float speed = -1, bool keeFace = false, bool keepAni = false, Action onReach = null)
+        {
+            endMoveByNextMove();
+            _tempSpeed = speed;
+            _keepFace = keeFace;
+            _keepAni = keepAni;
+            _onNearTarget += onReach;
+            moveStraight(end);
+        }
+
+        internal void MoveStraightByTime(Vector3 end, float time, bool keeFace, bool keepAni)
+        {
+            endMoveByNextMove();
+            _keepFace = keeFace;
+            _keepAni = keepAni;
+            mMoveByTime = true;
+            moveStraight(end);
+            _distance = time * speed;
+        }
+
+        private void moveStraight(Vector3 end)
+        {
+            if (float.IsInfinity(end.x))
+                return;
+            _path.Add(end);
+            beginMove();
+        }
+
+        internal override void Update()
+        {
+            base.Update();
+
+            if (!isMoving || _paused)
+            {
+                return;
+            }
+            mTime += GOERoot.RealTime.DeltaTime;
+            UpdateRotate();
+            UpdateForward();
+            UpdatePathNode();
+        }
+
+        private Vector3 _currentTarget;
+        private int _nodeIndex;
+        private void UpdatePathNode()
+        {
+            if (_nodeIndex < _path.Count)
+            {
+                if (_distance <= 0)
+                {
+                    _currentTarget = _path[_nodeIndex];
+                    if (Actor.OnUserMoveTo != null)
+                        Actor.OnUserMoveTo(Actor.Position, _currentTarget);
+                    mTime = 0;
+                    if (!_keepFace)
+                        setRotate();
+                    setForwad();
+                    _nodeIndex++;
+                }
+            }
+            else
+            {
+                if (_distance <= 0)
+                {
+                    if (!Vector3.Equals(Entity.Position, _currentTarget))
+                        setActorPos(_currentTarget);
+                    if (_rotateTime < mTime)
+                        endMove();
+                    else
+                    {
+                        stopForward();
+                        isMoving = false;
+                    }
+                }
+            }
+        }
+
+        private void UpdateRotate()
+        {
+            if (mTime >= _rotateTime)
+                return;
+            Actor.Rotation = Quaternion.Slerp(mFrom, mTo, this.mTime / this._rotateTime);
+        }
+
+        Quaternion mFrom;
+        Quaternion mTo;
+        float _rotateTime = -1;
+        private void setRotate()
+        {
+            Vector3 mInitialOrientation = Actor.Orientation;
+            Vector3 mTargetOrientation = _currentTarget - Actor.Position;
+
+            mInitialOrientation.y = 0;
+            mInitialOrientation = mInitialOrientation.normalized;
+
+            mTargetOrientation.y = 0;
+            mTargetOrientation = mTargetOrientation.normalized;
+            if (mInitialOrientation.EqualsVector3(ref mTargetOrientation) || Vector3.zero.EqualsVector3(ref mTargetOrientation))
+            {
+                _rotateTime = -1;
+                return;
+            }
+
+            _rotateTime = 0.4f;
+            mFrom = Quaternion.LookRotation(mInitialOrientation, Vector3.up);
+            mTo = Quaternion.LookRotation(mTargetOrientation, Vector3.up);
+            if (Actor.RotateSmooth || _atEdge)
+                return;
+            Entity.Rotation = mTo;
+            _rotateTime = -1;
+        }
+
+
+        private void UpdateForward()
+        {
+            if (_distance <= 0)
+                return;
+            float sp = speed;
+            float dis = GOERoot.RealTime.DeltaTime * sp;
+            if (dis > _distance)
+                dis = _distance;
+            _distance -= dis;
+            Vector3 v = this._direction * dis;
+            v = Actor.Position + v;
+            setActorPos(v);
+        }
+
+        private void setActorPos(Vector3 v)
+        {
+            this.Entity.Scene.CheckPositonByRayCast(ref v);
+            Actor.Position = v;
+        }
+
+        float _distance = -1;
+        Vector3 _direction;
+        private void setForwad()
+        {
+            if (Actor.Position.EqualsVector3(ref _currentTarget))
+            {
+                _distance = -1;
+                return;
+            }
+            _direction = _currentTarget - Actor.Position;
+            _distance = _direction.magnitude;
+            _direction.Normalize();
+        }
+
+        private void beginMove()
+        {
+            Enable = true;
+            _nodeIndex = 0;
+            mTime = 0f;
+            UpdatePathNode();
+            if (!_keepAni && !isMoving)
+            {
+                if (!string.IsNullOrEmpty(Actor.SlowMoveAnimation))
+                {
+                    if (Actor.MoveBlendTime > 0)
+                    {
+                        Actor.CrossFade(Actor.SlowMoveAnimation, Actor.MoveBlendTime, PlayMode.StopSameLayer, false);
+                        Actor.CrossFadeQueued(Actor.MoveAnimation, Actor.MoveBlendTime, QueueMode.CompleteOthers, PlayMode.StopSameLayer, false);
+                    }
+                    else
+                    {
+                        Actor.PlayAnimation(Actor.SlowMoveAnimation, PlayMode.StopSameLayer, false);
+                        Actor.PlayQueued(Actor.MoveAnimation, QueueMode.CompleteOthers, PlayMode.StopSameLayer, false);
+                    }
+                }
+                else
+                {
+                    if (Actor.MoveBlendTime > 0)
+                        Actor.CrossFade(Actor.MoveAnimation, Actor.MoveBlendTime, PlayMode.StopSameLayer, false);
+                    else
+                        Actor.PlayAnimation(Actor.MoveAnimation, PlayMode.StopSameLayer, false);
+                }
+            }
+            isMoving = true;
+        }
+
+        private void clearData()
+        {
+            isMoving = false;
+            Enable = false;
+            _nodeIndex = 0;
+            _rotateTime = -1;
+            _path.Clear();
+            _tempSpeed = 0;
+            _atEdge = false;
+            _keepFace = false;
+            _keepAni = false;
+            _distance = -1;
+            _lastDegree = -1000;
+        }
+
+        private void endMove(bool reach = true)
+        {
+            if (!isMoving)
+                return;
+            if (!reach)
+                _onNearTarget = null;
+            stopForward();
+            clearData();
+        }
+
+        private void stopForward()
+        {
+            if (!_keepAni)
+            {
+                if (!string.IsNullOrEmpty(Actor.BreakAnimation))
+                {
+                    if (Actor.MoveBlendTime > 0)
+                    {
+                        Actor.CrossFade(Actor.BreakAnimation, Actor.MoveBlendTime);
+                        Actor.CrossFadeQueued(Actor.StandAnimation, Actor.MoveBlendTime);
+                    }
+                    else
+                    {
+                        Actor.PlayAnimation(Actor.BreakAnimation);
+                        Actor.PlayQueued(Actor.StandAnimation);
+                    }
+                }
+                else
+                {
+                    if (Actor.MoveBlendTime > 0)
+                        Actor.CrossFade(Actor.StandAnimation, Actor.MoveBlendTime);
+                    else
+                        Actor.PlayAnimation(Actor.StandAnimation);
+                }
+            }
+            if (Actor.OnUserStopMove != null)
+                Actor.OnUserStopMove();
+            Action onNear = _onNearTarget;
+            if (onNear != null)
+            {
+                _onNearTarget = null;
+                onNear();
+            }
+        }
+    }
+
+}
+

@@ -1,0 +1,239 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2618F7A7-9267-4C28-8B4D-EFD5FB613951}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GOEngine</RootNamespace>
+    <AssemblyName>GOEngine</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Release\GOEngine.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EngineScript">
+      <HintPath>Editor\GOEngine\plugins\EngineScript.dll</HintPath>
+    </Reference>
+    <Reference Include="LightFace">
+      <HintPath>Editor\GOEngine\plugins\LightFace.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="TerrainX, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Editor\GOEngine\plugins\TerrainX.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Editor\GOEngine\plugins\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Editor\GOEngine\Common\GOEBaseComponent.cs" />
+    <Compile Include="Editor\GOEngine\Common\GOEComponentObject.cs" />
+    <Compile Include="Editor\GOEngine\Common\JsonFieldAttribute.cs" />
+    <Compile Include="Editor\GOEngine\Common\ResObject\GOEGameObjectRes.cs" />
+    <Compile Include="Editor\GOEngine\Common\ResObject\GOEObjectRes.cs" />
+    <Compile Include="Editor\GOEngine\CurvAnim\Enums.cs" />
+    <Compile Include="Editor\GOEngine\CurvAnim\GOECurvAnim.cs" />
+    <Compile Include="Editor\GOEngine\CurvAnim\GOECurvAnim.Editor.cs" />
+    <Compile Include="Editor\GOEngine\CurvAnim\GOECurvController.cs" />
+    <Compile Include="Editor\GOEngine\CurvAnim\GOECurvController.Editor.cs" />
+    <Compile Include="Editor\GOEngine\CurvAnim\GOECurvKeyFrame.cs" />
+    <Compile Include="Editor\GOEngine\CurvAnim\GOECurvKeyFrame.Editor.cs" />
+    <Compile Include="Editor\GOEngine\CurvAnim\GOECurvKeyFrameGO.cs" />
+    <Compile Include="Editor\GOEngine\GOERoot.cs" />
+    <Compile Include="Editor\GOEngine\Interfaces\EngineDelegate.cs" />
+    <Compile Include="Editor\GOEngine\Interfaces\EntityController.cs" />
+    <Compile Include="Editor\GOEngine\Interfaces\IEntity.cs" />
+    <Compile Include="Editor\GOEngine\Interfaces\IEntityController.cs" />
+    <Compile Include="Editor\GOEngine\Interfaces\IGOEActorEntity.cs" />
+    <Compile Include="Editor\GOEngine\Interfaces\IGOEAudioMgr.cs" />
+    <Compile Include="Editor\GOEngine\Interfaces\IGOEPostEffect.cs" />
+    <Compile Include="Editor\GOEngine\Interfaces\IGOECamera.cs" />
+    <Compile Include="Editor\GOEngine\Interfaces\IGOEEntityAct.cs" />
+    <Compile Include="Editor\GOEngine\Interfaces\IGOEGameScene.cs" />
+    <Compile Include="Editor\GOEngine\Interfaces\IGOELog.cs" />
+    <Compile Include="Editor\GOEngine\Interfaces\IGOEQualityMgr.cs" />
+    <Compile Include="Editor\GOEngine\Interfaces\IProjectResource.cs" />
+    <Compile Include="Editor\GOEngine\Interfaces\IRealtime.cs" />
+    <Compile Include="Editor\GOEngine\Log\GOELog.cs" />
+    <Compile Include="Editor\GOEngine\Log\GOELogger.cs" />
+    <Compile Include="Editor\GOEngine\Quality\GOEQualityMgr.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Audio\AudioClipLoader.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Audio\GOEAudioMgr.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Base\GOEResComponent.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Base\GOEResList.cs" />
+    <Compile Include="Editor\GOEngine\Resource\BundleMap\GOEBundleMap.cs" />
+    <Compile Include="Editor\GOEngine\Resource\BundleMap\GOEResBundleList.cs" />
+    <Compile Include="Editor\GOEngine\Resource\BundleMap\GOEResBundleRename.cs" />
+    <Compile Include="Editor\GOEngine\Resource\BundleMap\GOEResIdxMap.cs" />
+    <Compile Include="Editor\GOEngine\Resource\BundleMap\IndexMapItem.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Loader\GOEResource.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Loader\Group\GOEAssetBundleCache.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Loader\Group\GOEAssetBundleCacheManager.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Loader\Group\GOEAssetBundleGroup.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Loader\Group\GOEResTypeGroup.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Loader\Group\GOESceneBundleGroup.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Loader\Group\GOEStringDelegate.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Loader\Group\GOEWWWAudioGroup.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Loader\Group\GOEWWWFileGroup.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Loader\Progress\GOELoadingProgress.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Loader\Progress\GOELoadingProgressMgr.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Loader\ResourceLoader.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Loader\WWWLoader.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Locale\LocaleResource.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Object\GOEAsset.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Object\GOEBundleResource.cs" />
+    <Compile Include="Editor\GOEngine\Resource\Object\GOEBundle.cs" />
+    <Compile Include="Editor\GOEngine\Resource\ResMgr\EditorResource.cs" />
+    <Compile Include="Editor\GOEngine\Resource\ResMgr\LoaderMgr.cs" />
+    <Compile Include="Editor\GOEngine\Resource\ResMgr\ProjectResource.cs" />
+    <Compile Include="Editor\GOEngine\Resource\ResMgr\ResourceMgr.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Camera\Component\GOECameraComponent.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Camera\Component\GOECameraCurve.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Camera\Component\GOECameraShake.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Camera\Curve\CurveDefine.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Camera\Curve\CurveHolder.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Camera\Curve\CurveUtility.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Camera\GOECamera.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\ActTypeNameAttribute.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActActivePosSceneEffect.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActActorChangeShader.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActActorAttachment.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActActorEffect.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActActorVisible.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActAnimation.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActActorShake.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActChangeWeather.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActCameraControl.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActDetachBinding.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActMoveTargetToPos.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActAttachTarget.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActAttachVisible.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActCameraCurve.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActCameraShake.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActComponent.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActEffectRandomDirToTarget.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActEffectToPos.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActEffectToTarget.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActEvent.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActParaCurve.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActSceneEffect.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActSound.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActTurnDegree.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Act\GOEActTurnToTarget.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Animatior\GOEAnimatorConfig.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Component\GOEEntityAct.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Component\GOEEntityComponent.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Component\GOEEntityRotation.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Component\GOEEntityShake.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Component\GOEEntityMoveToDirect.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Component\GOEEntityFollowTransform.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Component\GOEEntityEffectMove.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Component\GOEEntityMaterial.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\Component\GOEEntityMoveTo.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\GOEActorEntity.cs" />
+    <Compile Include="Editor\GOEngine\Scene\Entity\GOEEntity.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEBaseScene.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEDetour\astar\AStarData.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEDetour\astar\AStarDataMgr.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEDetour\astar\AStarMultiTileMap.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEDetour\astar\bresenhamsLine\Bresenham.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEDetour\astar\core\AStar.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEDetour\astar\core\AStarCell.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEDetour\astar\core\AStarMap.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEDetour\astar\core\PathFinder.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEDetour\astar\graphics\PrintMap.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEDetour\astar\heuristics\AStarHeuristic.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEDetour\astar\heuristics\ClosestHeuristic.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEDetour\astar\heuristics\DiagonalHeuristic.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEDetour\astar\utils\Logger.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEDetour\astar\utils\MergeSortClass.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEDetour\astar\utils\Point.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEDetour\DetourMgr.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEGameScene.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOEScene.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOESceneComponent\GOESceneBigTerrainX.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOESceneComponent\GOESceneCameraTransitionAreaMgr.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOESceneComponent\GOESceneComponent.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOESceneComponent\GOESceneEntityContainer.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOESceneComponent\GOESceneRandomTile.cs" />
+    <Compile Include="Editor\GOEngine\Scene\GOESceneComponent\HeightMap.cs" />
+    <Compile Include="Editor\GOEngine\util\DisplayNameAttribute.cs" />
+    <Compile Include="Editor\GOEngine\util\ListUtil.cs" />
+    <Compile Include="Editor\GOEngine\util\FileUtil.cs" />
+    <Compile Include="Editor\GOEngine\util\GameObjectUtil.cs" />
+    <Compile Include="Editor\GOEngine\util\json\fastJSON\AssemblyInfo.cs" />
+    <Compile Include="Editor\GOEngine\util\json\fastJSON\fastJSON\DatasetSchema.cs" />
+    <Compile Include="Editor\GOEngine\util\json\fastJSON\fastJSON\Deserialize.cs" />
+    <Compile Include="Editor\GOEngine\util\json\fastJSON\fastJSON\deserializer.cs" />
+    <Compile Include="Editor\GOEngine\util\json\fastJSON\fastJSON\Formatter.cs" />
+    <Compile Include="Editor\GOEngine\util\json\fastJSON\fastJSON\Getters.cs" />
+    <Compile Include="Editor\GOEngine\util\json\fastJSON\fastJSON\JSON.cs" />
+    <Compile Include="Editor\GOEngine\util\json\fastJSON\fastJSON\JSONParameters.cs" />
+    <Compile Include="Editor\GOEngine\util\json\fastJSON\fastJSON\JsonParser.cs" />
+    <Compile Include="Editor\GOEngine\util\json\fastJSON\fastJSON\JSONSerializer.cs" />
+    <Compile Include="Editor\GOEngine\util\json\fastJSON\fastJSON\myPropInfo.cs" />
+    <Compile Include="Editor\GOEngine\util\json\fastJSON\fastJSON\myPropInfoFlags.cs" />
+    <Compile Include="Editor\GOEngine\util\json\fastJSON\fastJSON\myPropInfoType.cs" />
+    <Compile Include="Editor\GOEngine\util\json\fastJSON\fastJSON\Reflection.cs" />
+    <Compile Include="Editor\GOEngine\util\json\fastJSON\fastJSON\SafeDictionary!2.cs" />
+    <Compile Include="Editor\GOEngine\util\json\fastJSON\fastJSON\Serialize.cs" />
+    <Compile Include="Editor\GOEngine\util\json\fastJSON\Global.cs" />
+    <Compile Include="Editor\GOEngine\util\json\JasonSerializer.cs" />
+    <Compile Include="Editor\GOEngine\util\json\JsonUtil.cs" />
+    <Compile Include="Editor\GOEngine\util\MathUtil.cs" />
+    <Compile Include="Editor\GOEngine\util\MemoryPool.cs" />
+    <Compile Include="Editor\GOEngine\util\RagdollBuilder.cs" />
+    <Compile Include="Editor\GOEngine\util\Realtime.cs" />
+    <Compile Include="Editor\GOEngine\util\RenderLayerDef.cs" />
+    <Compile Include="Editor\GOEngine\util\SysConf.cs" />
+    <Compile Include="Editor\GOEngine\util\SysUtil.cs" />
+    <Compile Include="Editor\GOEngine\util\Vector3Extension.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Editor\GOEngine\plugins\TerrainX.dll" />
+    <Content Include="Editor\GOEngine\util\json\fastJSON\fastJSON.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Editor\GOEngine\Resource\Scripts\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy "GOEngine.dll" "../../../../longzu/code/blrCode/client/goe/client/project/Assets/GOEngine/plugins/GOEngine.dll"
+copy "GOEngine.pdb" "../../../../longzu/code/blrCode/client/goe/client/project/Assets/GOEngine/plugins/GOEngine.pdb"</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
